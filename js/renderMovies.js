@@ -3,6 +3,7 @@ import { renderPagination } from "./pagination.js";
 import { throwNotification } from "./notification.js";
 import { libraryContainsID } from "./library.js";
 import { fetchWithLoader } from "./loader.js";
+import { filteredURLConstructor, keywordURLConstructor } from "./searchAndFilters.js";
 let currentPage = 1;
 
 export const pageMovieMap = new Map();
@@ -10,40 +11,42 @@ export const pageMovieMap = new Map();
 async function renderMovies(moviesJSON) {
     console.log("Loading movies...");
 
-    const moviesArr = moviesJSON.items;
-    const totalPages = moviesJSON.totalPages;
+    const moviesArr = moviesJSON.docs;
+    const totalPages = moviesJSON.pages;
 
-    moviesArr.forEach((data) => {
-        const movieObj = {
-            id: data.kinopoiskId,
-            nameRu: data.nameRu,
-            nameOrig: data.nameOriginal,
-            img: data.posterUrl,
-            description: data.description,
-            truncatedDescr: truncDescription(data.description),
-            genres: parseGenres(data.genres),
-            rating: data.ratingKinopoisk,
-            year: data.year,
-            isAddedToLibrary: libraryContainsID(data.kinopoiskId),
-        };
+    moviesArr.forEach((data, index) => {
+        setTimeout(() => {
+            const movieObj = {
+                id: data.id,
+                nameRu: data.name,
+                nameOrig: data.alternativeName,
+                img: data && data.poster && data.poster.previewUrl ? data.poster.previewUrl : null,
+                description: data.description,
+                truncatedDescr: truncDescription(data.description),
+                genres: parseGenres(data.genres),
+                rating: data.rating.kp,
+                year: data.year,
+                isAddedToLibrary: libraryContainsID(data.id),
+            };
 
-        pageMovieMap.set(movieObj.id, movieObj);
+            pageMovieMap.set(movieObj.id, movieObj);
 
-        //
-        const movieHTML = getMovieHTML(movieObj);
+            //
+            const movieHTML = getMovieHTML(movieObj);
 
-        const moviesSection = document.querySelector(".movies-section");
-        moviesSection.insertAdjacentHTML("beforeend", movieHTML);
+            const moviesSection = document.querySelector(".movies-section");
+            moviesSection.insertAdjacentHTML("beforeend", movieHTML);
 
-        const movieCard = moviesSection.querySelector(`[id="${movieObj.id}"]`);
-        const addToLibraryBtn = movieCard.querySelector(".add-to-library");
-        if (movieObj.isAddedToLibrary) addToLibraryBtn.textContent = "В библиотеке";
-        const movieDescrEl = movieCard.querySelector(".movie-description");
-        const minimizeBtn = movieCard.querySelector(".minimize-button");
+            const movieCard = moviesSection.querySelector(`[id="${movieObj.id}"]`);
+            const addToLibraryBtn = movieCard.querySelector(".add-to-library");
+            if (movieObj.isAddedToLibrary) addToLibraryBtn.textContent = "В библиотеке";
+            const movieDescrEl = movieCard.querySelector(".movie-description");
+            const minimizeBtn = movieCard.querySelector(".minimize-button");
 
-        // Логика описания карточек
-        movieDescrEl.addEventListener("click", () => handleDescr(movieObj));
-        minimizeBtn.addEventListener("click", () => handleMinimizeBtn(movieObj));
+            // Логика описания карточек
+            movieDescrEl.addEventListener("click", () => handleDescr(movieObj));
+            minimizeBtn.addEventListener("click", () => handleMinimizeBtn(movieObj));
+        }, index * 100); // Interval 200 miliseconds so not too many requests
     });
     console.log(pageMovieMap);
 
@@ -54,7 +57,7 @@ function parseGenres(genres) {
     const genresStr = [];
     const genresLength = 3;
     genres.forEach((obj) => {
-        genresStr.push(obj.genre);
+        genresStr.push(obj.name);
     });
 
     return genresStr.slice(0, genresLength).join(", ");
@@ -70,16 +73,17 @@ export async function handleTop250(page) {
     let currentPage = page;
 
     const response = await fetchWithLoader(
-        `https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?type=TOP_250_MOVIES&page=${page}`,
+        `https://api.kinopoisk.dev/v1.4/movie?limit=20&sortField=rating.kp&sortType=-1&lists=top250&page=${page}`,
         {
             method: "GET",
             headers: {
-                "X-API-KEY": "e8506cf6-b39e-428c-b791-818e964966f4",
+                "X-API-KEY": "B71AS27-Q9CMCW8-HXMVCB7-2K8AWZB",
                 "Content-Type": "application/json",
             },
         }
     );
     const json = await response.json();
+    console.log(json);
 
     // Очищаем перед новым рендером
     showOnlySection("movies-section");
@@ -88,19 +92,36 @@ export async function handleTop250(page) {
     renderPagination(pages, handleTop250, currentPage);
 }
 
-export async function handleSearch() {
-    console.log("Searching...");
+export async function handleFilteredSearch(page) {
+    //
+    const keyword = encodeURIComponent(document.querySelector(".searchWrapper .searchMovie").value);
+    let url;
+    if (keyword !== "") {
+        url = keywordURLConstructor(keyword);
+    } else {
+        url = filteredURLConstructor();
+    }
 
-    const response = await fetch(
-        `https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?type=TOP_250_MOVIES&page=${page}`,
-        {
-            method: "GET",
-            headers: {
-                "X-API-KEY": "e8506cf6-b39e-428c-b791-818e964966f4",
-                "Content-Type": "application/json",
-            },
-        }
-    );
+    if (url === null) return;
+
+    // Очищаем перед новым рендером
+    showOnlySection("movies-section");
+
+    console.log(`SEARCHING FOR ${url}&page=${page}`);
+    const response = await fetchWithLoader(`${url}&page=${page}`, {
+        method: "GET",
+        headers: {
+            "X-API-KEY": "B71AS27-Q9CMCW8-HXMVCB7-2K8AWZB",
+            "Content-Type": "application/json",
+        },
+    });
+    const json = await response.json();
+
+    console.log(json);
+
+    // Рендер
+    const pages = await renderMovies(json);
+    renderPagination(pages, handleFilteredSearch, currentPage);
 }
 
 export function showOnlySection(className) {
@@ -122,7 +143,7 @@ export function getMovieHTML(movieObj) {
     const movieHTML = `<div class="movie-card" id="${movieObj.id}">
         <img
         src="${movieObj.img}"
-        alt="Movie ${movieObj.id} image"
+        alt="No image for ${movieObj.id} movie :("
         />
         <div class="movie-info">
         <h3 class="movie-title">${movieObj.nameRu}</h3>

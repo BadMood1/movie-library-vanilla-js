@@ -14,7 +14,6 @@ export function showUserPanel(type) {
         const userPanel = `<div class="user-panel">
             <div class="panel-wrapper">
                 <button class="loadMovies">Лучшие Фильмы 250</button>
-                <button class="randMovie">Случайный Выбор</button>
             </div>  
             <div class="textWrapper"><span class="text">Главная</span></div>
         </div>`;
@@ -33,15 +32,13 @@ export function showUserPanel(type) {
     }
 
     if (type === "library") {
-        const userPanel = `<header class="user-panel">
+        const userPanel = `<div class="user-panel">
                 <div class="panel-wrapper">
                 
                 </div>
                 <div class="textWrapper"><span class="text">Библиотека</span></div>
-            </header>`;
+            </div>`;
 
         header.insertAdjacentHTML("afterend", userPanel);
     }
 }
-
-// showUserPanel("main");

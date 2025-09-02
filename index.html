@@ -105,24 +105,18 @@
                 <form class="searchWrapper">
                     <input type="search" class="searchMovie" placeholder="Поиск..." />
                     <div class="controlContainer">
-                        <button class="searchFilters">
+                        <button class="searchFilters" type="button">
                             <i class="bxr bx-slider-alt"></i>
                         </button>
-                        <button class="searchSubmit">
+                        <button class="searchSubmit" type="submit">
                             <i class="bxr bx-search"></i>
                         </button>
                     </div>
                 </form>
             </header>
-            <div id="loader"></div>
+            <div class="user-panel"></div>
 
-            <!-- <div class="user-panel">
-                <div class="panel-wrapper">
-                    <button class="loadMovies">Load TOP 250</button>
-                    <button class="loadMovies">Load TOP 250</button>
-                </div>
-                <div class="textWrapper"><span class="text">Main</span></div>
-            </div> -->
+            <div id="loader"></div>
 
             <!-- ======= СЕКЦИЯ ФИЛЬМОВ ======= -->
             <!-- <section class="library-section"></section> -->
@@ -217,6 +211,7 @@
         <!-- Скрипты и постоянные блоки -->
         <div class="notifications-container"></div>
         <div class="blur"></div>
+        <script type="module" src="js/searchAndFilters.js"></script>
         <script type="module" src="js/loader.js"></script>
         <script type="module" src="js/themeColor.js"></script>
         <script type="module" src="js/sidebar.js"></script>

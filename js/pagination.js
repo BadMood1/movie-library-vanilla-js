@@ -5,6 +5,10 @@ export function renderPagination(totalPages, callBackFunc, currentPage) {
     const paginationOld = document.querySelector(".pagination-container");
     if (paginationOld) paginationOld.remove();
 
+    console.log("totalPages", totalPages);
+
+    if (totalPages === 1) return;
+
     // Создаём элемент пагинации
 
     const paginationElHTML = `<div class="pagination-container">

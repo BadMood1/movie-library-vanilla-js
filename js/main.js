@@ -9,10 +9,8 @@ import { handleTop250 } from "./renderMovies.js";
 import { throwNotification } from "./notification.js";
 import { showUserPanel } from "./userPanel.js";
 import { renderLibrary } from "./library.js";
-
+import { showFiltersPanel } from "./searchAndFilters.js";
 // DEFAULT load
-
-// showUserPanel("main");
 
 //
 
@@ -29,4 +27,13 @@ const libraryBtn = sidebar.querySelector(".library-page");
 libraryBtn.addEventListener("click", () => {
     showUserPanel("library");
     renderLibrary();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    showUserPanel("main");
+    throwNotification(
+        "Внимание!",
+        "Поиск по ключевым словам не использует фильтры из-за ограничений API",
+        13000
+    );
 });

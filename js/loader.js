@@ -1,4 +1,8 @@
-export async function fetchWithLoader(url, options = {}) {
+import { throwNotification } from "./notification.js";
+import { renderPagination } from "./pagination.js";
+import { showOnlySection } from "./renderMovies.js";
+
+export async function fetchWithLoader(url, options) {
     console.log("LOADING...");
 
     const loader = document.getElementById("loader");
@@ -23,6 +27,9 @@ export async function fetchWithLoader(url, options = {}) {
         return response;
     } catch (err) {
         console.error("Fetch error: ", err);
+        document.querySelector(".pagination-container").remove();
+        showOnlySection("movies-section");
+        throwNotification("Ошибка соединения!", "Попробуйте повторить попытку позже", 3000);
         throw err; // Чтобы вызывающий код узнал об ошибке
     } finally {
         loader.style.display = "none";
