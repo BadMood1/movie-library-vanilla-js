@@ -2,18 +2,15 @@ import { handleFilteredSearch } from "./renderMovies.js";
 
 const filtersBtn = document.querySelector(".searchWrapper .searchFilters");
 
-let isFiltersShown = "false";
-
 filtersBtn.addEventListener("click", () => {
-    isFiltersShown = showFiltersPanel();
+    showFiltersPanel();
 });
 
 const searchBtn = document.querySelector(".searchWrapper .searchSubmit");
 
-searchBtn.addEventListener("click", () => {
+searchBtn.addEventListener("click", (event) => {
+    event.preventDefault();
     handleFilteredSearch(1);
-    // filteredURLConstructor();
-    // test();
 });
 
 export function showFiltersPanel() {
@@ -63,7 +60,7 @@ export function showFiltersPanel() {
                         </div>
                         <div class="panel-row">
                             <label for="">Рейтинг от</label>
-                            <input type="text" class="ratingBefore-input-filter" value="0" inputmode="numeric" />
+                            <input type="text" class="ratingBefore-input-filter" value="7" inputmode="numeric" />
                             <span>до</span>
                             <input type="text" class="ratingAfter-input-filter" value="10" inputmode="numeric" />
                         </div>
@@ -81,7 +78,6 @@ export function showFiltersPanel() {
 export function filteredURLConstructor() {
     const filtersEl = document.querySelector(".filters-wrapper");
     if (!filtersEl) {
-        console.log("NO FILTER ELEM");
         return null;
     }
 
@@ -93,16 +89,9 @@ export function filteredURLConstructor() {
 
     let year = "";
     if (yearFrom && yearTo) year = `${yearFrom}-${yearTo}`;
-    // else {
-    //     year += yearFrom;
-    //     year += yearTo;
-    // }
+
     let rating = "";
     if (ratingFrom && ratingTo) rating = `${ratingFrom}-${ratingTo}`;
-
-    if (!"") console.log("PASSSSSSSSSSSSSSSSSSSSSSSSSSSed");
-
-    console.log(year, rating);
 
     const filters = {
         sortField: filtersEl.querySelector(".sorting-select-filter").value,
@@ -111,8 +100,6 @@ export function filteredURLConstructor() {
         type: filtersEl.querySelector(".type-select-filter").value,
         "rating.kp": rating,
     };
-
-    console.log(filters);
 
     let filtersStringTags = "";
     for (const key in filters) {
@@ -126,13 +113,9 @@ export function filteredURLConstructor() {
     const sortType = 1;
     if (filters.sortField !== "") filtersStringTags += `&sortType=${sortType}`;
 
-    const keyword = encodeURIComponent(document.querySelector(".searchWrapper .searchMovie").value);
-    console.log(keyword);
-
     // page=${page}
     let filtersURL = `https://api.kinopoisk.dev/v1.4/movie?limit=20`;
     filtersURL += filtersStringTags;
-    console.log(filtersURL);
 
     return filtersURL;
 }

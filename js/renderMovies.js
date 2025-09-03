@@ -9,8 +9,6 @@ let currentPage = 1;
 export const pageMovieMap = new Map();
 
 async function renderMovies(moviesJSON) {
-    console.log("Loading movies...");
-
     const moviesArr = moviesJSON.docs;
     const totalPages = moviesJSON.pages;
 
@@ -48,7 +46,6 @@ async function renderMovies(moviesJSON) {
             minimizeBtn.addEventListener("click", () => handleMinimizeBtn(movieObj));
         }, index * 100); // Interval 200 miliseconds so not too many requests
     });
-    console.log(pageMovieMap);
 
     return totalPages;
 }
@@ -83,7 +80,6 @@ export async function handleTop250(page) {
         }
     );
     const json = await response.json();
-    console.log(json);
 
     // Очищаем перед новым рендером
     showOnlySection("movies-section");
@@ -98,6 +94,7 @@ export async function handleFilteredSearch(page) {
     let url;
     if (keyword !== "") {
         url = keywordURLConstructor(keyword);
+        throwNotification("Внимание!", "Выполняется поиск по ключевому слову. Без фильтров!", 4000);
     } else {
         url = filteredURLConstructor();
     }
@@ -116,8 +113,6 @@ export async function handleFilteredSearch(page) {
         },
     });
     const json = await response.json();
-
-    console.log(json);
 
     // Рендер
     const pages = await renderMovies(json);

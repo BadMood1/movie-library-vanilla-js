@@ -1,18 +1,16 @@
 "use strict";
 
 const body = document.querySelector("body"),
-    sidebar = body.querySelector(".sidebar"),
-    toggle = body.querySelector(".toggle"),
-    searchBtn = body.querySelector(".search-box");
+    sidebar = body.querySelector(".sidebar");
 
 import { handleTop250 } from "./renderMovies.js";
 import { throwNotification } from "./notification.js";
 import { showUserPanel } from "./userPanel.js";
 import { renderLibrary } from "./library.js";
-import { showFiltersPanel } from "./searchAndFilters.js";
 // DEFAULT load
 
 //
+let hasLibraryBeenVisited = false;
 
 const mainPageBtn = sidebar.querySelector(".main-page");
 console.log(mainPageBtn);
@@ -27,6 +25,14 @@ const libraryBtn = sidebar.querySelector(".library-page");
 libraryBtn.addEventListener("click", () => {
     showUserPanel("library");
     renderLibrary();
+    if (!hasLibraryBeenVisited) {
+        setTimeout(
+            () => throwNotification("Внимание!", "Панель поиска не доступна для библиотеки.", 5000),
+            1000
+        );
+
+        hasLibraryBeenVisited = true;
+    }
 });
 
 document.addEventListener("DOMContentLoaded", () => {

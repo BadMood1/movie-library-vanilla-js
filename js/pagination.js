@@ -7,7 +7,7 @@ export function renderPagination(totalPages, callBackFunc, currentPage) {
 
     console.log("totalPages", totalPages);
 
-    if (totalPages === 1) return;
+    if (totalPages <= 1) return;
 
     // Создаём элемент пагинации
 

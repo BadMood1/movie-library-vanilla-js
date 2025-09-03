@@ -6,7 +6,6 @@ const mainPage = document.querySelector(".home");
 export let libraryMovies = [];
 if (localStorage.getItem("libraryMovies")) {
     libraryMovies = JSON.parse(decodeURIComponent(localStorage.getItem("libraryMovies")));
-    console.log("Library:", libraryMovies);
 }
 
 mainPage.addEventListener("click", (event) => {
@@ -19,7 +18,6 @@ mainPage.addEventListener("click", (event) => {
     if (libraryContainsID(id)) {
         // Удаляем объект по айди
         const index = libraryMovies.findIndex((movie) => movie.id === id);
-        console.log(index);
         libraryMovies.splice(index, 1);
         addBtn.textContent = "Удалено";
 
@@ -30,7 +28,7 @@ mainPage.addEventListener("click", (event) => {
             isLibraryEmpty(librarySection);
         }
 
-        localStorage.setItem("libraryMovies", encodeURIComponent(JSON.stringify(libraryMovies)));
+        updateLibraryStorage();
         return;
     }
 
@@ -39,16 +37,18 @@ mainPage.addEventListener("click", (event) => {
     if (movieFromMap) {
         movieFromMap.isAddedToLibrary = true;
         libraryMovies.push(movieFromMap);
-        console.log(movieFromMap);
         addBtn.textContent = "В библиотеке";
     }
 
-    localStorage.setItem("libraryMovies", encodeURIComponent(JSON.stringify(libraryMovies)));
+    updateLibraryStorage();
 });
 
+function updateLibraryStorage() {
+    localStorage.setItem("libraryMovies", encodeURIComponent(JSON.stringify(libraryMovies)));
+}
+
 export function libraryContainsID(id) {
-    if (libraryMovies.find((movie) => movie.id === id)) return true;
-    else return false;
+    return libraryMovies.some((movie) => movie.id === id); // returns true\false
 }
 
 export function renderLibrary() {
@@ -80,7 +80,6 @@ export function renderLibrary() {
 
 export function isLibraryEmpty(librarySection) {
     if (libraryMovies.length === 0 && !librarySection.hasChildNodes()) {
-        console.log(librarySection.hasChildNodes());
         const emptyLibraryHTML = '<div class="empty-library">Библиотека пуста</div>';
         librarySection.insertAdjacentHTML("afterbegin", emptyLibraryHTML);
         return true;
