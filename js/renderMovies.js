@@ -70,14 +70,14 @@ export async function handleTop250(page) {
     let currentPage = page;
 
     const response = await fetchWithLoader(
-        `https://api.kinopoisk.dev/v1.4/movie?limit=20&sortField=rating.kp&sortType=-1&lists=top250&page=${page}`,
+        `https://api.poiskkino.dev/v1.4/movie?limit=20&sortField=rating.kp&sortType=-1&lists=top250&page=${page}`,
         {
             method: "GET",
             headers: {
                 "X-API-KEY": "B71AS27-Q9CMCW8-HXMVCB7-2K8AWZB",
                 "Content-Type": "application/json",
             },
-        }
+        },
     );
     const json = await response.json();
 
